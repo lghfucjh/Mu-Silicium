@@ -1,0 +1,31 @@
+name: Build rmx2202 UEFI
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - 'Platforms/Realme/rmx2202Pkg/**'
+      - 'Resources/Configs/rmx2202.toml'
+      - 'Resources/DTBs/rmx2202.*'
+      - 'Binaries/rmx2202/**'
+      - 'Silicium-ACPI/Platforms/Realme/rmx2202/**'
+      - '.github/workflows/rmx2202.yml'
+env:
+  CI_BUILD: true
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+      - name: Setup build env
+        run: bash ./setup_env.sh -p apt
+      - name: Build UEFI
+        run: python3 build_uefi.py -d rmx2202 -r DEBUG
+      - name: Upload UEFI image
+        uses: actions/upload-artifact@v7
+        with:
+          name: uefi-rmx2202
+          path: ./Mu-rmx2202*
+          compression-level: 9
